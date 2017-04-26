@@ -1,0 +1,28 @@
+﻿TYPE,DATA,NAME,LABEL,UNITS,META,GROUP,REQUIRE,CONSTRAINT
+SSC_INPUT,SSC_NUMBER,year,Year,yr,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,month,Month,mn,12-Jan,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,day,Day,dy,1-days in month,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,hour,Hour,hr,0-23,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,minute,Minute,min,0-59,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,lat,Latitude,deg,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,lon,Longitude,deg,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,tz,Time zone,hr,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,beam,Beam normal irradiance,W/m2,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,diffuse,Diffuse irradiance,W/m2,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,tamb,Ambient temperature,C,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,wspd,Wind speed,m/s,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,alb,Albedo,frac,,PVWatts,?=0.2,
+SSC_INPUT,SSC_NUMBER,time_step,Time step of input data,hr,,PVWatts,?=1,POSITIVE
+SSC_INPUT,SSC_NUMBER,system_capacity,System size (DC nameplate),kW,,PVWatts,*,
+SSC_INPUT,SSC_NUMBER,module_type,Module type,0/1/2,"Standard,Premium,Thin film",PVWatts,?=0,"MIN=0,MAX=2,INTEGER"
+SSC_INPUT,SSC_NUMBER,dc_ac_ratio,DC to AC ratio,ratio,,PVWatts,?=1.1,POSITIVE
+SSC_INPUT,SSC_NUMBER,inv_eff,Inverter efficiency at rated power,%,,PVWatts,?=96,"MIN=90,MAX=99.5"
+SSC_INPUT,SSC_NUMBER,losses,System losses,%,Total system losses,PVWatts,*,"MIN=-5,MAX=99"
+SSC_INPUT,SSC_NUMBER,array_type,Array type,0/1/2/3/4,"Fixed OR,Fixed Roof,1Axis,Backtracked,2Axis",PVWatts,*,"MIN=0,MAX=4,INTEGER"
+SSC_INPUT,SSC_NUMBER,tilt,Tilt angle,deg,"H=0,V=90",PVWatts,*,"MIN=0,MAX=90"
+SSC_INPUT,SSC_NUMBER,azimuth,Azimuth angle,deg,"E=90,S=180,W=270",PVWatts,*,"MIN=0,MAX=360"
+SSC_INPUT,SSC_NUMBER,gcr,Ground coverage ratio,0..1,,PVWatts,?=0.4,"MIN=0,MAX=3"
+SSC_INOUT,SSC_NUMBER,tcell,Module temperature,C,,PVWatts,*,
+SSC_INOUT,SSC_NUMBER,poa,Plane of array irradiance,W/m2,,PVWatts,*,
+SSC_OUTPUT,SSC_NUMBER,dc,DC array output,Wdc,,PVWatts,*,
+SSC_OUTPUT,SSC_NUMBER,ac,AC system output,Wac,,PVWatts,*,

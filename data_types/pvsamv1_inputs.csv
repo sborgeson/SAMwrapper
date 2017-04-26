@@ -1,0 +1,569 @@
+﻿TYPE,DATA,NAME,LABEL,UNITS,META,GROUP,REQUIRE,CONSTRAINT
+SSC_INPUT,SSC_STRING,solar_resource_file,"Weather file in TMY2, TMY3, EPW, or SAM CSV.",,,pvsamv1,?,
+SSC_INPUT,SSC_TABLE,solar_resource_data,Weather data,,"lat,lon,tz,elev,year,month,hour,minute,gh,dn,df,tdry,twet,tdew,rhum,pres,snow,alb,aod,wspd,wdir",pvsamv1,?,
+SSC_INPUT,SSC_NUMBER,pv_lifetime_simulation,PV lifetime simulation,0/1,,pvsamv1,?=0,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,analysis_period,Lifetime analysis period,years,,pvsamv1,pv_lifetime_simulation=1,
+SSC_INPUT,SSC_ARRAY,dc_degradation,Annual module degradation,%/year,,pvsamv1,pv_lifetime_simulation=1,
+SSC_OUTPUT,SSC_ARRAY,dc_degrade_factor,Annual module degrade factor,,,pvsamv1,pv_lifetime_simulation=1,
+SSC_INPUT,SSC_NUMBER,en_snow_model,Toggle snow loss estimation,0/1,,snowmodel,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,system_capacity,Nameplate capacity,kW,,pvsamv1,*,
+SSC_INPUT,SSC_NUMBER,use_wf_albedo,Use albedo in weather file if provided,0/1,,pvsamv1,?=1,BOOLEAN
+SSC_INPUT,SSC_ARRAY,albedo,User specified ground albedo,0..1,,pvsamv1,*,LENGTH=12
+SSC_INPUT,SSC_NUMBER,irrad_mode,Irradiance input translation mode,,"0=beam&diffuse,1=total&beam,2=total&diffuse,3=poa_reference,4=poa_pyranometer",pvsamv1,?=0,"INTEGER,MIN=0,MAX=4"
+SSC_INPUT,SSC_NUMBER,sky_model,Diffuse sky model,,"0=isotropic,1=hkdr,2=perez",pvsamv1,?=2,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,modules_per_string,Modules per string,,,pvsamv1,*,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,strings_in_parallel,String in parallel,,,pvsamv1,*,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,inverter_count,Number of inverters,,,pvsamv1,*,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,enable_mismatch_vmax_calc,Enable mismatched subarray Vmax calculation,,,pvsamv1,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray1_tilt,Sub-array 1 Tilt,deg,"0=horizontal,90=vertical",pvsamv1,naof:subarray1_tilt_eq_lat,"MIN=0,MAX=90"
+SSC_INPUT,SSC_NUMBER,subarray1_tilt_eq_lat,Sub-array 1 Tilt=latitude override,0/1,,pvsamv1,na:subarray1_tilt,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray1_azimuth,Sub-array 1 Azimuth,deg,"0=N,90=E,180=S,270=W",pvsamv1,*,"MIN=0,MAX=359.9"
+SSC_INPUT,SSC_NUMBER,subarray1_track_mode,Sub-array 1 Tracking mode,,"0=fixed,1=1axis,2=2axis,3=azi",pvsamv1,*,"INTEGER,MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray1_rotlim,Sub-array 1 Tracker rotation limit,deg,,pvsamv1,?=45,"MIN=5,MAX=85"
+SSC_INPUT,SSC_NUMBER,subarray1_shade_mode,Sub-array 1 shading mode (fixed tilt or 1x tracking),0/1/2,"0=none,1=standard(non-linear),2=thin film(linear)",pvsamv1,*,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,subarray1_gcr,Sub-array 1 Ground coverage ratio,0..1,,pvsamv1,?=0.3,"MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray1_shading:string_option,Sub-array 1 shading string option,,"0=shadingdb,1=shadingdb_notc,2=average,3=maximum,4=minimum",pvsamv1,?=-1,"INTEGER,MIN=-1,MAX=4"
+SSC_INPUT,SSC_MATRIX,subarray1_shading:timestep,Sub-array 1 timestep beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray1_shading:mxh,Sub-array 1 Month x Hour beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray1_shading:azal,Sub-array 1 Azimuth x altitude beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_NUMBER,subarray1_shading:diff,Sub-array 1 Diffuse shading loss,%,,pvsamv1,?,
+SSC_INPUT,SSC_ARRAY,subarray1_soiling,Sub-array 1 Monthly soiling loss,%,,pvsamv1,*,LENGTH=12
+SSC_INPUT,SSC_NUMBER,subarray1_mismatch_loss,Sub-array 1 DC mismatch loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray1_diodeconn_loss,Sub-array 1 DC diodes and connections loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray1_dcwiring_loss,Sub-array 1 DC wiring loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray1_tracking_loss,Sub-array 1 DC tracking error loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray1_nameplate_loss,Sub-array 1 DC nameplate loss,%,,pvsamv1,*,"MIN=-5,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray2_mismatch_loss,Sub-array 2 DC mismatch loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray2_diodeconn_loss,Sub-array 2 DC diodes and connections loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray2_dcwiring_loss,Sub-array 2 DC wiring loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray2_tracking_loss,Sub-array 2 DC tracking error loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray2_nameplate_loss,Sub-array 2 DC nameplate loss,%,,pvsamv1,?,"MIN=-5,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray3_mismatch_loss,Sub-array 3 DC mismatch loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray3_diodeconn_loss,Sub-array 3 DC diodes and connections loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray3_dcwiring_loss,Sub-array 3 DC wiring loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray3_tracking_loss,Sub-array 3 DC tracking error loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray3_nameplate_loss,Sub-array 3 DC nameplate loss,%,,pvsamv1,?,"MIN=-5,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray4_mismatch_loss,Sub-array 4 DC mismatch loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray4_diodeconn_loss,Sub-array 4 DC diodes and connections loss,%,?,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray4_dcwiring_loss,Sub-array 4 DC wiring loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray4_tracking_loss,Sub-array 4 DC tracking error loss,%,,pvsamv1,?,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray4_nameplate_loss,Sub-array 4 DC nameplate loss,%,,pvsamv1,?,"MIN=-5,MAX=100"
+SSC_INPUT,SSC_NUMBER,dcoptimizer_loss,DC power optimizer loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,acwiring_loss,AC wiring loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,transformer_loss,AC step-up transformer loss,%,,pvsamv1,*,"MIN=0,MAX=100"
+SSC_INPUT,SSC_NUMBER,subarray1_mod_orient,Sub-array 1 Module orientation for self-shading,0/1,"0=portrait,1=landscape",pvsamv1,subarray1_shade_mode>0,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,subarray1_nmodx,Sub-array 1 no. of modules along bottom for self-shading,,,pvsamv1,subarray1_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray1_nmody,Sub-array 1 no. of modules along side for self-shading,,,pvsamv1,subarray1_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray1_backtrack,Sub-array 1 Backtracking enabled,,"0=no backtracking,1=backtrack",pvsamv1,subarray1_track_mode=1,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray2_enable,Sub-array 2 Enable,0/1,"0=disabled,1=enabled",pvsamv1,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray2_nstrings,Sub-array 2 Number of parallel strings,,,pvsamv1,subarray2_enable=1,INTEGER
+SSC_INPUT,SSC_NUMBER,subarray2_tilt,Sub-array 2 Tilt,deg,"0=horizontal,90=vertical",pvsamv1,naof:subarray2_tilt_eq_lat,"MIN=0,MAX=90"
+SSC_INPUT,SSC_NUMBER,subarray2_tilt_eq_lat,Sub-array 2 Tilt=latitude override,0/1,,pvsamv1,na:subarray2_tilt,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray2_azimuth,Sub-array 2 Azimuth,deg,"0=N,90=E,180=S,270=W",pvsamv1,subarray2_enable=1,"MIN=0,MAX=359.9"
+SSC_INPUT,SSC_NUMBER,subarray2_track_mode,Sub-array 2 Tracking mode,,"0=fixed,1=1axis,2=2axis,3=azi",pvsamv1,subarray2_enable=1,"INTEGER,MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray2_rotlim,Sub-array 2 Tracker rotation limit,deg,,pvsamv1,?=45,"MIN=5,MAX=85"
+SSC_INPUT,SSC_NUMBER,subarray2_shade_mode,Sub-array 2 shading mode (fixed tilt or 1x tracking),0/1/2,"0=none,1=standard(non-linear),2=thin film(linear)",pvsamv1,*,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,subarray2_gcr,Sub-array 2 Ground coverage ratio,0..1,,pvsamv1,?=0.3,"MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray2_shading:string_option,Sub-array 2 shading string option,,"0=shadingdb,1=shadingdb_notc,2=average,3=maximum,4=minimum",pvsamv1,?=-1,"INTEGER,MIN=-1,MAX=4"
+SSC_INPUT,SSC_MATRIX,subarray2_shading:timestep,Sub-array 2 timestep beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray2_shading:mxh,Sub-array 2 Month x Hour beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray2_shading:azal,Sub-array 2 Azimuth x altitude beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_NUMBER,subarray2_shading:diff,Sub-array 2 Diffuse shading loss,%,,pvsamv1,?,
+SSC_INPUT,SSC_ARRAY,subarray2_soiling,Sub-array 2 Monthly soiling loss,%,,pvsamv1,subarray2_enable=1,LENGTH=12
+SSC_INPUT,SSC_NUMBER,subarray2_mod_orient,Sub-array 2 Module orientation for self-shading,0/1,"0=portrait,1=landscape",pvsamv1,subarray2_shade_mode>0,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,subarray2_nmodx,Sub-array 2 no. of modules along bottom for self-shading,,,pvsamv1,subarray2_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray2_nmody,Sub-array 2 no. of modules along side for self-shading,,,pvsamv1,subarray2_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray2_backtrack,Sub-array 2 Backtracking enabled,,"0=no backtracking,1=backtrack",pvsamv1,subarray2_track_mode=1,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray3_enable,Sub-array 3 Enable,0/1,"0=disabled,1=enabled",pvsamv1,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray3_nstrings,Sub-array 3 Number of parallel strings,,,pvsamv1,subarray3_enable=1,INTEGER
+SSC_INPUT,SSC_NUMBER,subarray3_tilt,Sub-array 3 Tilt,deg,"0=horizontal,90=vertical",pvsamv1,naof:subarray3_tilt_eq_lat,"MIN=0,MAX=90"
+SSC_INPUT,SSC_NUMBER,subarray3_tilt_eq_lat,Sub-array 3 Tilt=latitude override,0/1,,pvsamv1,na:subarray3_tilt,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray3_azimuth,Sub-array 3 Azimuth,deg,"0=N,90=E,180=S,270=W",pvsamv1,subarray3_enable=1,"MIN=0,MAX=359.9"
+SSC_INPUT,SSC_NUMBER,subarray3_track_mode,Sub-array 3 Tracking mode,,"0=fixed,1=1axis,2=2axis,3=azi",pvsamv1,subarray3_enable=1,"INTEGER,MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray3_rotlim,Sub-array 3 Tracker rotation limit,deg,,pvsamv1,?=45,"MIN=5,MAX=85"
+SSC_INPUT,SSC_NUMBER,subarray3_shade_mode,Sub-array 3 shading mode (fixed tilt or 1x tracking),0/1/2,"0=none,1=standard(non-linear),2=thin film(linear)",pvsamv1,*,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,subarray3_gcr,Sub-array 3 Ground coverage ratio,0..1,,pvsamv1,?=0.3,"MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray3_shading:string_option,Sub-array 3 shading string option,,"0=shadingdb,1=shadingdb_notc,2=average,3=maximum,4=minimum",pvsamv1,?=-1,"INTEGER,MIN=-1,MAX=4"
+SSC_INPUT,SSC_MATRIX,subarray3_shading:timestep,Sub-array 3 timestep beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray3_shading:mxh,Sub-array 3 Month x Hour beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray3_shading:azal,Sub-array 3 Azimuth x altitude beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_NUMBER,subarray3_shading:diff,Sub-array 3 Diffuse shading loss,%,,pvsamv1,?,
+SSC_INPUT,SSC_ARRAY,subarray3_soiling,Sub-array 3 Monthly soiling loss,%,,pvsamv1,subarray3_enable=1,LENGTH=12
+SSC_INPUT,SSC_NUMBER,subarray3_mod_orient,Sub-array 3 Module orientation for self-shading,0/1,"0=portrait,1=landscape",pvsamv1,subarray1_shade_mode>0,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,subarray3_nmodx,Sub-array 3 no. of modules along bottom for self-shading,,,pvsamv1,subarray3_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray3_nmody,Sub-array 3 no. of modules along side for self-shading,,,pvsamv1,subarray3_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray3_backtrack,Sub-array 3 Backtracking enabled,,"0=no backtracking,1=backtrack",pvsamv1,subarray3_track_mode=1,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray4_enable,Sub-array 4 Enable,0/1,"0=disabled,1=enabled",pvsamv1,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray4_nstrings,Sub-array 4 Number of parallel strings,,,pvsamv1,subarray4_enable=1,INTEGER
+SSC_INPUT,SSC_NUMBER,subarray4_tilt,Sub-array 4 Tilt,deg,"0=horizontal,90=vertical",pvsamv1,naof:subarray4_tilt_eq_lat,"MIN=0,MAX=90"
+SSC_INPUT,SSC_NUMBER,subarray4_tilt_eq_lat,Sub-array 4 Tilt=latitude override,0/1,,pvsamv1,na:subarray4_tilt,BOOLEAN
+SSC_INPUT,SSC_NUMBER,subarray4_azimuth,Sub-array 4 Azimuth,deg,"0=N,90=E,180=S,270=W",pvsamv1,subarray4_enable=1,"MIN=0,MAX=359.9"
+SSC_INPUT,SSC_NUMBER,subarray4_track_mode,Sub-array 4 Tracking mode,,"0=fixed,1=1axis,2=2axis,3=azi",pvsamv1,subarray4_enable=1,"INTEGER,MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray4_rotlim,Sub-array 4 Tracker rotation limit,deg,,pvsamv1,?=45,"MIN=5,MAX=85"
+SSC_INPUT,SSC_NUMBER,subarray4_shade_mode,Sub-array 4 shading mode (fixed tilt or 1x tracking),0/1/2,"0=none,1=standard(non-linear),2=thin film(linear)",pvsamv1,*,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,subarray4_gcr,Sub-array 4 Ground coverage ratio,0..1,,pvsamv1,?=0.3,"MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,subarray4_shading:string_option,Sub-array 4 shading string option,,"0=shadingdb,1=shadingdb_notc,2=average,3=maximum,4=minimum",pvsamv1,?=-1,"INTEGER,MIN=-1,MAX=4"
+SSC_INPUT,SSC_MATRIX,subarray4_shading:timestep,Sub-array 4 timestep beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray4_shading:mxh,Sub-array 4 Month x Hour beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_MATRIX,subarray4_shading:azal,Sub-array 4 Azimuth x altitude beam shading losses,%,,pvsamv1,?,
+SSC_INPUT,SSC_NUMBER,subarray4_shading:diff,Sub-array 4 Diffuse shading loss,%,,pvsamv1,?,
+SSC_INPUT,SSC_ARRAY,subarray4_soiling,Sub-array 4 Monthly soiling loss,%,,pvsamv1,subarray4_enable=1,LENGTH=12
+SSC_INPUT,SSC_NUMBER,subarray4_mod_orient,Sub-array 4 Module orientation for self-shading,0/1,"0=portrait,1=landscape",pvsamv1,subarray4_shade_mode>0,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,subarray4_nmodx,Sub-array 4 no. of modules along bottom for self-shading,,,pvsamv1,subarray4_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray4_nmody,Sub-array 4 no. of modules along side for self-shading,,,pvsamv1,subarray4_shade_mode>0,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,subarray4_backtrack,Sub-array 4 Backtracking enabled,,"0=no backtracking,1=backtrack",pvsamv1,subarray4_track_mode=1,BOOLEAN
+SSC_INPUT,SSC_NUMBER,module_model,Photovoltaic module model specifier,,"0=spe,1=cec,2=6par_user,3=snl,4=sd11-iec61853",pvsamv1,*,"INTEGER,MIN=0,MAX=4"
+SSC_INPUT,SSC_NUMBER,spe_area,Module area,m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_rad0,Irradiance level 0,W/m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_rad1,Irradiance level 1,W/m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_rad2,Irradiance level 2,W/m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_rad3,Irradiance level 3,W/m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_rad4,Irradiance level 4,W/m2,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_eff0,Efficiency at irradiance level 0,%,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_eff1,Efficiency at irradiance level 1,%,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_eff2,Efficiency at irradiance level 2,%,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_eff3,Efficiency at irradiance level 3,%,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_eff4,Efficiency at irradiance level 4,%,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_reference,Reference irradiance level,,,pvsamv1,module_model=0,"INTEGER,MIN=0,MAX=4"
+SSC_INPUT,SSC_NUMBER,spe_module_structure,Mounting and module structure,,"0=glass/cell/polymer sheet - open rack,1=glass/cell/glass - open rack,2=polymer/thin film/steel - open rack,3=Insulated back, building-integrated PV,4=close roof mount,5=user-defined",pvsamv1,module_model=0,"INTEGER,MIN=0,MAX=5"
+SSC_INPUT,SSC_NUMBER,spe_a,Cell temp parameter a,,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_b,Cell temp parameter b,,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_dT,Cell temp parameter dT,,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_temp_coeff,Temperature coefficient,%/C,,pvsamv1,module_model=0,
+SSC_INPUT,SSC_NUMBER,spe_fd,Diffuse fraction,0..1,,pvsamv1,module_model=0,"MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,spe_vmp,Nominal max power voltage,V,,pvsamv1,module_model=0,POSITIVE
+SSC_INPUT,SSC_NUMBER,spe_voc,Nominal open circuit voltage,V,,pvsamv1,module_model=0,POSITIVE
+SSC_INPUT,SSC_NUMBER,cec_area,Module area,m2,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_a_ref,Nonideality factor a,,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_adjust,Temperature coefficient adjustment,%,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_alpha_sc,Short circuit current temperature coefficient,A/C,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_beta_oc,Open circuit voltage temperature coefficient,V/C,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_gamma_r,Maximum power point temperature coefficient,%/C,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_i_l_ref,Light current,A,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_i_mp_ref,Maximum power point current,A,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_i_o_ref,Saturation current,A,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_i_sc_ref,Short circuit current,A,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_n_s,Number of cells in series,,,pvsamv1,module_model=1,POSITIVE
+SSC_INPUT,SSC_NUMBER,cec_r_s,Series resistance,ohm,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_r_sh_ref,Shunt resistance,ohm,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_t_noct,Nominal operating cell temperature,C,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_v_mp_ref,Maximum power point voltage,V,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_v_oc_ref,Open circuit voltage,V,,pvsamv1,module_model=1,
+SSC_INPUT,SSC_NUMBER,cec_temp_corr_mode,Cell temperature model selection,,"0=noct,1=mc",pvsamv1,module_model=1,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,cec_standoff,Standoff mode,,"0=bipv,1=>3.5in,2=2.5-3.5in,3=1.5-2.5in,4=0.5-1.5in,5=<0.5in,6=ground/rack",pvsamv1,module_model=1,"INTEGER,MIN=0,MAX=6"
+SSC_INPUT,SSC_NUMBER,cec_height,Array mounting height,,"0=one story,1=two story",pvsamv1,module_model=1,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,cec_mounting_config,Mounting configuration,,"0=rack,1=flush,2=integrated,3=gap",pvsamv1,module_model=1&cec_temp_corr_mode=1,"INTEGER,MIN=0,MAX=3"
+SSC_INPUT,SSC_NUMBER,cec_heat_transfer,Heat transfer dimensions,,"0=module,1=array",pvsamv1,module_model=1&cec_temp_corr_mode=1,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,cec_mounting_orientation,Mounting structure orientation,,"0=do not impede flow,1=vertical supports,2=horizontal supports",pvsamv1,module_model=1&cec_temp_corr_mode=1,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,cec_gap_spacing,Gap spacing,m,,pvsamv1,module_model=1&cec_temp_corr_mode=1,
+SSC_INPUT,SSC_NUMBER,cec_module_width,Module width,m,,pvsamv1,module_model=1&cec_temp_corr_mode=1,
+SSC_INPUT,SSC_NUMBER,cec_module_length,Module height,m,,pvsamv1,module_model=1&cec_temp_corr_mode=1,
+SSC_INPUT,SSC_NUMBER,cec_array_rows,Rows of modules in array,,,pvsamv1,module_model=1&cec_temp_corr_mode=1,
+SSC_INPUT,SSC_NUMBER,cec_array_cols,Columns of modules in array,,,pvsamv1,module_model=1&cec_temp_corr_mode=1,
+SSC_INPUT,SSC_NUMBER,cec_backside_temp,Module backside temperature,C,,pvsamv1,module_model=1&cec_temp_corr_mode=1,POSITIVE
+SSC_INPUT,SSC_NUMBER,6par_celltech,Solar cell technology type,,"monoSi=0,multiSi=1,CdTe=2,CIS=3,CIGS=4,Amorphous=5",pvsamv1,module_model=2,"INTEGER,MIN=0,MAX=5"
+SSC_INPUT,SSC_NUMBER,6par_vmp,Maximum power point voltage,V,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_imp,Imp,A,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_voc,Voc,V,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_isc,Isc,A,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_bvoc,Short circuit current temperature coefficient,V/C,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_aisc,Open circuit voltage temperature coefficient,A/C,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_gpmp,Maximum power point temperature coefficient,%/C,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_nser,Nseries,,,pvsamv1,module_model=2,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,6par_area,Module area,m2,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_tnoct,Nominal operating cell temperature,C,,pvsamv1,module_model=2,
+SSC_INPUT,SSC_NUMBER,6par_standoff,Standoff mode,,"0=bipv,1=>3.5in,2=2.5-3.5in,3=1.5-2.5in,4=0.5-1.5in,5=<0.5in,6=ground/rack",pvsamv1,module_model=2,"INTEGER,MIN=0,MAX=6"
+SSC_INPUT,SSC_NUMBER,6par_mounting,Array mounting height,,"0=one story,1=two story",pvsamv1,module_model=2,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,snl_module_structure,Module and mounting structure configuration,,"0=Use Database Values,1=glass/cell/polymer sheet - open rack,2=glass/cell/glass - open rack,3=polymer/thin film/steel - open rack,4=Insulated back building-integrated PV,5=close roof mount,6=user-defined",pvsamv1,module_model=3,"INTEGER,MIN=0,MAX=6"
+SSC_INPUT,SSC_NUMBER,snl_a,Temperature coefficient a,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b,Temperature coefficient b,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_dtc,Temperature coefficient dT,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_ref_a,User-specified a,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_ref_b,User-specified b,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_ref_dT,User-specified dT,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_fd,Diffuse fraction,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_a0,Air mass polynomial coeff 0,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_a1,Air mass polynomial coeff 1,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_a2,Air mass polynomial coeff 2,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_a3,Air mass polynomial coeff 3,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_a4,Air mass polynomial coeff 4,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_aimp,Max power point current temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_aisc,Short circuit current temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_area,Module area,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b0,Incidence angle modifier polynomial coeff 0,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b1,Incidence angle modifier polynomial coeff 1,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b2,Incidence angle modifier polynomial coeff 2,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b3,Incidence angle modifier polynomial coeff 3,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b4,Incidence angle modifier polynomial coeff 4,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_b5,Incidence angle modifier polynomial coeff 5,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_bvmpo,Max power point voltage temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_bvoco,Open circuit voltage temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c0,C0,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c1,C1,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c2,C2,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c3,C3,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c4,C4,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c5,C5,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c6,C6,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_c7,C7,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_impo,Max power point current,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_isco,Short circuit current,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_ixo,Ix midpoint current,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_ixxo,Ixx midpoint current,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_mbvmp,Irradiance dependence of Vmp temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_mbvoc,Irradiance dependence of Voc temperature coefficient,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_n,Diode factor,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_series_cells,Number of cells in series,,,pvsamv1,module_model=3,INTEGER
+SSC_INPUT,SSC_NUMBER,snl_vmpo,Max power point voltage,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,snl_voco,Open circuit voltage,,,pvsamv1,module_model=3,
+SSC_INPUT,SSC_NUMBER,sd11par_nser,Nseries,,,pvsamv1,module_model=4,"INTEGER,POSITIVE"
+SSC_INPUT,SSC_NUMBER,sd11par_area,Module area,m2,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_AMa0,Air mass modifier coeff 0,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_AMa1,Air mass modifier coeff 1,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_AMa2,Air mass modifier coeff 2,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_AMa3,Air mass modifier coeff 3,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_AMa4,Air mass modifier coeff 4,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_glass,Cover glass type,,"0=normal,1=AR glass",pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_tnoct,Nominal operating cell temperature,C,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_standoff,Standoff mode,,"0=bipv,1=>3.5in,2=2.5-3.5in,3=1.5-2.5in,4=0.5-1.5in,6=<0.5in,5=ground/rack",pvsamv1,module_model=4,"INTEGER,MIN=0,MAX=6"
+SSC_INPUT,SSC_NUMBER,sd11par_mounting,Array mounting height,,"0=one story,1=two story",pvsamv1,module_model=4,"INTEGER,MIN=0,MAX=1"
+SSC_INPUT,SSC_NUMBER,sd11par_Vmp0,Vmp (STC),V,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Imp0,Imp (STC),A,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Voc0,Voc (STC),V,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Isc0,Isc (STC),A,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_alphaIsc,Open circuit voltage temperature coefficient,A/C,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_n,Diode nonideality factor,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Il,Light current,A,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Io,Saturation current,A,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_Egref,Bandgap voltage,eV,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_d1,Rs fit parameter 1,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_d2,Rs fit parameter 2,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_d3,Rs fit parameter 3,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_c1,Rsh fit parameter 1,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_c2,Rsh fit parameter 2,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,sd11par_c3,Rsh fit parameter 3,,,pvsamv1,module_model=4,
+SSC_INPUT,SSC_NUMBER,inverter_model,Inverter model specifier,,"0=cec,1=datasheet,2=partload",pvsamv1,*,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_NUMBER,mppt_low_inverter,Minimum inverter MPPT voltage window,Vdc,,pvsamv1,,?=0
+SSC_INPUT,SSC_NUMBER,mppt_hi_inverter,Maximum inverter MPPT voltage window,Vdc,,pvsamv1,,?=0
+SSC_INPUT,SSC_NUMBER,inv_snl_c0,Curvature between ac-power and dc-power at ref,1/W,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_c1,Coefficient of Pdco variation with dc input voltage,1/V,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_c2,Coefficient of Pso variation with dc input voltage,1/V,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_c3,Coefficient of Co variation with dc input voltage,1/V,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_paco,AC maximum power rating,Wac,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_pdco,DC input power at which ac-power rating is achieved,Wdc,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_pnt,AC power consumed by inverter at night,Wac,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_pso,DC power required to enable the inversion process,Wdc,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_vdco,DC input voltage for the rated ac-power rating,Vdc,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_snl_vdcmax,Maximum dc input operating voltage,Vdc,,pvsamv1,inverter_model=0,
+SSC_INPUT,SSC_NUMBER,inv_ds_paco,AC maximum power rating,Wac,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_ds_eff,Weighted or Peak or Nominal Efficiency,Wdc,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_ds_pnt,AC power consumed by inverter at night,Wac,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_ds_pso,DC power required to enable the inversion process,Wdc,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_ds_vdco,DC input voltage for the rated ac-power rating,Vdc,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_ds_vdcmax,Maximum dc input operating voltage,Vdc,,pvsamv1,inverter_model=1,
+SSC_INPUT,SSC_NUMBER,inv_pd_paco,AC maximum power rating,Wac,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_NUMBER,inv_pd_pdco,DC input power at which ac-power rating is achieved,Wdc,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_ARRAY,inv_pd_partload,Partload curve partload values,%,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_ARRAY,inv_pd_efficiency,Partload curve efficiency values,%,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_NUMBER,inv_pd_pnt,AC power consumed by inverter at night,Wac,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_NUMBER,inv_pd_vdco,DC input voltage for the rated ac-power rating,Vdc,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_NUMBER,inv_pd_vdcmax,Maximum dc input operating voltage,Vdc,,pvsamv1,inverter_model=2,
+SSC_INPUT,SSC_NUMBER,en_batt,Enable battery storage model,0/1,,Battery,?=0,
+SSC_INPUT,SSC_NUMBER,batt_replacement_option,Enable battery replacement?,"0=none,1=capacity based,2=user schedule",,Battery,?=0,"INTEGER,MIN=0,MAX=2"
+SSC_INPUT,SSC_ARRAY,batt_replacement_schedule,Battery bank replacements per year (user specified),number/year,,Battery,batt_replacement_option=2,
+SSC_INPUT,SSC_ARRAY,load,Electricity load (year 1),kW,,Battery,?,
+SSC_INPUT,SSC_NUMBER,batt_dispatch_choice,Battery dispatch algorithm,0/1/2,,Battery,?=0,
+SSC_OUTPUT,SSC_ARRAY,gh,Irradiance GHI from weather file,W/m2,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,dn,Irradiance DNI from weather file,W/m2,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,df,Irradiance DHI from weather file,W/m2,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,wfpoa,Irradiance POA from weather file,W/m2,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,gh_calc,Irradiance GHI calculated,W/m2,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,dn_calc,Irradiance DNI calculated,W/m2,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,df_calc,Irradiance DHI calculated,W/m2,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,wspd,Wind speed from weather file,m/s,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,tdry,Ambient temperature from weather file,C,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,sol_zen,Sun zenith angle,deg,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,sol_alt,Sun altitude angle,deg,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,sol_azi,Sun azimuth angle,deg,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,sunup,Sun up over horizon,0/1,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,sunpos_hour,Sun position calculation time,hour,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,airmass,Absolute air mass,,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,alb,Albedo,,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,snowdepth,Snow depth from weather file,cm,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,subarray1_aoi,Subarray 1 Angle of incidence,deg,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_surf_tilt,Subarray 1 Surface tilt,deg,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_surf_azi,Subarray 1 Surface azimuth,deg,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_axisrot,Subarray 1 Axis rotation for 1 axis trackers,deg,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_idealrot,Subarray 1 Ideal axis rotation for 1 axis trackers,deg,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_poa_nom,Subarray 1 POA total irradiance (nominal),W/m2,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_poa_shaded,Subarray 1 POA total irradiance after shading only,W/m2,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_poa_eff,Subarray 1 POA total irradiance after shading and soiling,W/m2,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_poa_eff_beam,Subarray 1 POA beam irradiance after shading and soiling,W/m2,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_poa_eff_diff,Subarray 1 POA diffuse irradiance after shading and soiling,W/m2,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_beam_shading_factor,Subarray 1 Beam irradiance shading factor,frac,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_linear_derate,Subarray 1 Self-shading linear derate,,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_ss_derate,Subarray 1 Self-shading DC derate,,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_ss_diffuse_derate,Subarray 1 Self-shading diffuse derate,,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_ss_reflected_derate,Subarray 1 Self-shading reflected derate,,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_modeff,Subarray 1 Module efficiency,%,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_soiling_derate,Subarray 1 Soiling derate,frac,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_celltemp,Subarray 1 Cell temperature,C,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray1_snow_loss,Subarray 1 Power loss due to snow (DC),kW,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray1_snow_coverage,Subarray 1 Snow coverage,0..1,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray1_dc_voltage,Subarray 1 DC string voltage,V,,Time Series (Subarray 1),*,
+SSC_OUTPUT,SSC_ARRAY,subarray2_aoi,Subarray 2 Angle of incidence,deg,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_surf_tilt,Subarray 2 Surface tilt,deg,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_surf_azi,Subarray 2 Surface azimuth,deg,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_axisrot,Subarray 2 Axis rotation for 1 axis trackers,deg,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_idealrot,Subarray 2 Ideal axis rotation for 1 axis trackers,deg,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_poa_nom,Subarray 2 POA total irradiance (nominal),W/m2,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_poa_shaded,Subarray 2 POA total irradiance after shading only,W/m2,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_poa_eff,Subarray 2 POA total irradiance after shading and soiling,W/m2,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_poa_eff_beam,Subarray 2 POA beam irradiance after shading and soiling,W/m2,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_poa_eff_diff,Subarray 2 POA diffuse irradiance after shading and soiling,W/m2,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_beam_shading_factor,Subarray 2 Beam irradiance shading factor,frac,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_linear_derate,Subarray 2 Self-shading linear derate,,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_ss_derate,Subarray 2 Self-shading DC derate,,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_ss_diffuse_derate,Subarray 2 Self-shading diffuse derate,,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_ss_reflected_derate,Subarray 2 Self-shading reflected derate,,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_modeff,Subarray 2 Module efficiency,%,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_soiling_derate,Subarray 2 Soiling derate,frac,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_celltemp,Subarray 2 Cell temperature,C,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_snow_loss,Subarray 2 Power loss due to snow (DC),kW,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_snow_coverage,Subarray 2 Snow coverage,0..1,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray2_dc_voltage,Subarray 2 DC string voltage,V,,Time Series (Subarray 2),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_aoi,Subarray 3 Angle of incidence,deg,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_surf_tilt,Subarray 3 Surface tilt,deg,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_surf_azi,Subarray 3 Surface azimuth,deg,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_axisrot,Subarray 3 Axis rotation for 1 axis trackers,deg,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_idealrot,Subarray 3 Ideal axis rotation for 1 axis trackers,deg,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_poa_nom,Subarray 3 POA total irradiance (nominal),W/m2,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_poa_shaded,Subarray 3 POA total irradiance after shading only,W/m2,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_poa_eff,Subarray 3 POA total irradiance after shading and soiling,W/m2,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_poa_eff_beam,Subarray 3 POA beam irradiance after shading and soiling,W/m2,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_poa_eff_diff,Subarray 3 POA diffuse irradiance after shading and soiling,W/m2,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_beam_shading_factor,Subarray 3 Beam irradiance shading factor,frac,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_linear_derate,Subarray 3 Self-shading linear derate,,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_ss_derate,Subarray 3 Self-shading DC derate,,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_ss_diffuse_derate,Subarray 3 Self-shading diffuse derate,,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_ss_reflected_derate,Subarray 3 Self-shading reflected derate,,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_modeff,Subarray 3 Module efficiency,%,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_soiling_derate,Subarray 3 Soiling derate,frac,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_celltemp,Subarray 3 Cell temperature,C,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_snow_loss,Subarray 3 Power loss due to snow (DC),kW,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_snow_coverage,Subarray 3 Snow coverage,0..1,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray3_dc_voltage,Subarray 3 DC string voltage,V,,Time Series (Subarray 3),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_aoi,Subarray 4 Angle of incidence,deg,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_surf_tilt,Subarray 4 Surface tilt,deg,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_surf_azi,Subarray 4 Surface azimuth,deg,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_axisrot,Subarray 4 Axis rotation for 1 axis trackers,deg,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_idealrot,Subarray 4 Ideal axis rotation for 1 axis trackers,deg,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_poa_nom,Subarray 4 POA total irradiance (nominal),W/m2,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_poa_shaded,Subarray 4 POA total irradiance after shading only,W/m2,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_poa_eff,Subarray 4 POA total irradiance after shading and soiling,W/m2,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_poa_eff_beam,Subarray 4 POA beam irradiance after shading and soiling,W/m2,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_poa_eff_diff,Subarray 4 POA diffuse irradiance after shading and soiling,W/m2,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_beam_shading_factor,Subarray 4 Beam irradiance shading factor,frac,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_linear_derate,Subarray 4 Self-shading linear derate,,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_ss_derate,Subarray 4 Self-shading DC derate,,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_ss_diffuse_derate,Subarray 4 Self-shading diffuse derate,,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_ss_reflected_derate,Subarray 4 Self-shading reflected derate,,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_modeff,Subarray 4 Module efficiency,%,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_soiling_derate,Subarray 4 Soiling derate,frac,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_celltemp,Subarray 4 Cell temperature,C,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_snow_loss,Subarray 4 Power loss due to snow (DC),kW,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_snow_coverage,Subarray 4 snow coverage,0..1,,Time Series (Subarray 1),,
+SSC_OUTPUT,SSC_ARRAY,subarray4_dc_voltage,Subarray 4 DC string voltage,V,,Time Series (Subarray 4),,
+SSC_OUTPUT,SSC_ARRAY,poa_nom,POA total radiation (nominal),kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,poa_beam_nom,POA beam radiation (nominal),kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,poa_shaded,POA total radiation after shading only,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,poa_eff,POA total radiation after shading and soiling,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,poa_beam_eff,POA beam radiation after shading and soiling,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,inverter_dc_voltage,Inverter dc input voltage,V,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,dc_snow_loss,Power loss due to snow (DC),kW,,Time Series,,
+SSC_OUTPUT,SSC_ARRAY,dc_net,Array power (DC),kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,monthly_snow_loss,Energy loss due to snow (DC),kWh,,Monthly,,
+SSC_OUTPUT,SSC_NUMBER,annual_snow_loss,Energy loss due to snow (DC),kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,system_use_lifetime_output,Use lifetime output,0/1,,Miscellaneous,*,INTEGER
+SSC_OUTPUT,SSC_NUMBER,ts_shift_hours,Time offset for interpreting time series outputs,hours,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,annual_energy,Annual energy,kWh,,Annual,*,
+SSC_OUTPUT,SSC_ARRAY,inv_eff,Inverter efficiency,%,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,dc_invmppt_loss,Inverter clipping loss DC MPPT voltage limits,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,inv_cliploss,Inverter clipping loss AC power limit,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,inv_psoloss,Inverter power consumption loss,kW,,Time Series,*,
+SSC_OUTPUT,SSC_ARRAY,inv_pntloss,Inverter night time loss,kW,,Time Series,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_invmppt_loss,Inverter clipping loss DC MPPT voltage limits,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_inv_cliploss,Inverter clipping loss AC power limit,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_inv_psoloss,Inverter power consumption loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_inv_pntloss,Inverter night time loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_ARRAY,monthly_poa_nom,POA total radiation (nominal),kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_poa_beam_nom,POA beam radiation (nominal),kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_poa_eff,POA total radiation after shading and soiling,kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_poa_beam_eff,POA beam radiation after shading and soiling,kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_dc,PV array energy (DC),kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_energy,System energy (AC),kWh,,Monthly,*,LENGTH=12
+SSC_OUTPUT,SSC_NUMBER,annual_gh,Irradiance- GHI- annual,kWh/m2,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_nom,POA total radiation (nominal),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_beam_nom,POA beam radiation (nominal),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_shaded,POA total radiation after shading only,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_eff,POA total radiation after shading and soiling,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_beam_eff,POA beam radiation after shading and soiling,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_nominal,PV array energy nominal (DC),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_gross,PV array energy gross (DC),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_net,PV array energy (DC),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_gross,System energy gross (AC),kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,nameplate_dc_rating,System nameplate DC rating,kW,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,subarray1_dcloss,Sub-array 1 Total DC power loss,%,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,subarray2_dcloss,Sub-array 2 Total DC power loss,%,,Annual,subarray2_enable=1,
+SSC_OUTPUT,SSC_NUMBER,subarray3_dcloss,Sub-array 3 Total DC power loss,%,,Annual,subarray3_enable=1,
+SSC_OUTPUT,SSC_NUMBER,subarray4_dcloss,Sub-array 4 Total DC power loss,%,,Annual,subarray4_enable=1,
+SSC_OUTPUT,SSC_NUMBER,ac_loss,Interconnection AC loss,%,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_gross,Subarray 1 gross DC energy,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_mismatch_loss,Subarray 1 DC mismatch loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_diodes_loss,Subarray 1 DC diodes and connections loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_wiring_loss,Subarray 1 DC wiring loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_tracking_loss,Subarray 1 DC tracking loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray1_dc_nameplate_loss,Subarray 1 DC nameplate loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_gross,Subarray 2 gross DC energy,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_mismatch_loss,Subarray 2 DC mismatch loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_diodes_loss,Subarray 2 DC diodes and connections loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_wiring_loss,Subarray 2 DC wiring loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_tracking_loss,Subarray 2 DC tracking loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray2_dc_nameplate_loss,Subarray 2 DC nameplate loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_gross,Subarray 3 gross DC energy,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_mismatch_loss,Subarray 3 DC mismatch loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_diodes_loss,Subarray 3 DC diodes and connections loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_wiring_loss,Subarray 3 DC wiring loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_tracking_loss,Subarray 3 DC tracking loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray3_dc_nameplate_loss,Subarray 3 DC nameplate loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_gross,Subarray 4 gross DC energy,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_mismatch_loss,Subarray 4 DC mismatch loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_diodes_loss,Subarray 4 DC diodes and connections loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_wiring_loss,Subarray 4 DC wiring loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_tracking_loss,Subarray 4 DC tracking loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_subarray4_dc_nameplate_loss,Subarray 4 DC nameplate loss,kWh,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_mismatch_loss,DC mismatch loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_diodes_loss,DC diodes and connections loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_wiring_loss,DC wiring loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_tracking_loss,DC tracking loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_nameplate_loss,DC nameplate loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_optimizer_loss,DC power optimizer loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_shading_loss_percent,POA shading loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_poa_soiling_loss_percent,POA soiling loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_module_loss_percent,DC module modeled loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_snow_loss_percent,DC snow loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_mppt_clip_loss_percent,DC inverter MPPT clipping loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_mismatch_loss_percent,DC mismatch loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_diodes_loss_percent,DC diodes and connections loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_wiring_loss_percent,DC wiring loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_tracking_loss_percent,DC tracking loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_nameplate_loss_percent,DC nameplate loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_optimizer_loss_percent,DC power optimizer loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_inv_clip_loss_percent,AC inverter power clipping loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_inv_pso_loss_percent,AC inverter power consumption loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_inv_pnt_loss_percent,AC inverter night tare loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_inv_eff_loss_percent,AC inverter efficiency loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_wiring_loss_percent,AC wiring loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_transformer_loss_percent,AC step-up transformer loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_perf_adj_loss_percent,AC performance adjustment loss,%,,Loss,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_wiring_loss,AC wiring loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_ac_transformer_loss,AC step-up transformer loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,annual_dc_optimizer_loss,DC power optimizer loss,kWh,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,6par_a,CEC 6-parameter: a,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,6par_Io,CEC 6-parameter: Io,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,6par_Il,CEC 6-parameter: Il,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,6par_Rs,CEC 6-parameter: Rs,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,6par_Rsh,CEC 6-parameter: Rsh,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,6par_Adj,CEC 6-parameter: Adj,,,Miscellaneous,*,
+SSC_OUTPUT,SSC_NUMBER,performance_ratio,Performance ratio,,,Annual,*,
+SSC_OUTPUT,SSC_NUMBER,capacity_factor,Capacity factor,%,,,*,
+SSC_OUTPUT,SSC_NUMBER,kwh_per_kw,First year kWh/kW,kWh/kW,,,*,
+SSC_INPUT,SSC_NUMBER,adjust:constant,Constant loss adjustment,%,,Loss Adjustments,*,MAX=100
+SSC_INPUT,SSC_ARRAY,adjust:hourly,Hourly loss adjustments,%,,Loss Adjustments,?,LENGTH=8760
+SSC_INPUT,SSC_MATRIX,adjust:periods,Period-based loss adjustments,%,"n x 3 matrix [ start, end, loss ]",Loss Adjustments,?,COLS=3
+SSC_OUTPUT,SSC_ARRAY,gen,Power generated by system,kW,,Time Series,*,
+SSC_INPUT,SSC_NUMBER,pv_lifetime_simulation,PV lifetime simulation,0/1,,,?=0,BOOLEAN
+SSC_INPUT,SSC_NUMBER,analysis_period,Lifetime analysis period,years,,,pv_lifetime_simulation=1,
+SSC_INPUT,SSC_NUMBER,batt_dc_ac_efficiency,Battery DC to AC efficiency,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_ac_dc_efficiency,Inverter AC to battery DC efficiency,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_computed_strings,Number of strings of cells,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_computed_series,Number of cells in series,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_computed_bank_capacity,Computed bank capacity,kWh,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_chem,Battery chemistry,,"0=LeadAcid,1=LiIon",Battery,,
+SSC_INPUT,SSC_NUMBER,batt_minimum_SOC,Minimum allowed state-of-charge,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_maximum_SOC,Minimum allowed state-of-charge,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_current_charge_max,Maximum charge current,A,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_current_discharge_max,Maximum discharge current,A,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_minimum_modetime,Minimum time at charge state,min,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Vfull,Fully charged cell voltage,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Vexp,Cell voltage at end of exponential zone,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Vnom,Cell voltage at end of nominal zone,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Vnom_default,Default nominal cell voltage,V,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Qfull,Fully charged cell capacity,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Qexp,Cell capacity at end of exponential zone,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Qnom,Cell capacity at end of nominal zone,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_C_rate,Rate at which voltage vs. capacity curve input,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_resistance,Internal resistance,Ohm,,Battery,,
+SSC_INPUT,SSC_NUMBER,LeadAcid_q20_computed,Capacity at 20-hour discharge rate,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,LeadAcid_q10_computed,Capacity at 10-hour discharge rate,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,LeadAcid_qn_computed,Capacity at discharge rate for n-hour rate,Ah,,Battery,,
+SSC_INPUT,SSC_NUMBER,LeadAcid_tn,Time to discharge,h,,Battery,,
+SSC_INPUT,SSC_MATRIX,batt_lifetime_matrix,Cycles vs capacity at different depths-of-discharge,,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_replacement_capacity,Capacity degradation at which to replace battery,%,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_mass,Battery mass,kg,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_length,Battery length,m,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_width,Battery width,m,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_height,Battery height,m,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_Cp,Battery specific heat capacity,J/KgK,,Battery,,
+SSC_INPUT,SSC_NUMBER,batt_h_to_ambient,Heat transfer between battery and environment,W/m2K,,Battery,,
+SSC_INPUT,SSC_NUMBER,T_room,Temperature of storage room,C,,Battery,,
+SSC_INPUT,SSC_MATRIX,cap_vs_temp,Effective capacity as function of temperature,"C,%",,Battery,,
+SSC_INPUT,SSC_ARRAY,dispatch_manual_charge,Periods 1-6 charging allowed?,,,Battery,,
+SSC_INPUT,SSC_ARRAY,dispatch_manual_discharge,Periods 1-6 discharging allowed?,,,Battery,,
+SSC_INPUT,SSC_ARRAY,dispatch_manual_gridcharge,Periods 1-6 grid charging allowed?,,,Battery,,
+SSC_INPUT,SSC_ARRAY,dispatch_manual_percent_discharge,Periods 1-6 discharge percent,%,,Battery,,
+SSC_INPUT,SSC_ARRAY,dispatch_manual_percent_gridcharge,Periods 1-6 gridcharge percent,%,,Battery,,
+SSC_INPUT,SSC_MATRIX,dispatch_manual_sched,Battery dispatch schedule for weekday,,,Battery,,
+SSC_INPUT,SSC_MATRIX,dispatch_manual_sched_weekend,Battery dispatch schedule for weekend,,,Battery,,
+SSC_INPUT,SSC_ARRAY,batt_target_power,Grid target power for every time step,kW,,Battery,?=0,
+SSC_INPUT,SSC_ARRAY,batt_target_power_monthly,Grid target power on monthly basis,kW,,Battery,?=0,
+SSC_INPUT,SSC_NUMBER,batt_target_choice,Target power input option,0/1,,Battery,?=0,
+SSC_INPUT,SSC_NUMBER,batt_dispatch_choice,Battery dispatch algorithm,0/1/2,,Battery,?=0,
+SSC_INPUT,SSC_NUMBER,batt_pv_choice,Prioritize PV usage for load or battery,0/1,,Battery,?=0,
+SSC_OUTPUT,SSC_ARRAY,batt_q0,Battery total charge,Ah,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_q1,Battery available charge,Ah,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_q2,Battery bound charge,Ah,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_SOC,Battery state of charge,%,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_DOD,Battery cycle depth of discharge,%,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_qmaxI,Battery maximum capacity at current,Ah,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_qmax,Battery maximum charge,Ah,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_I,Battery current,A,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_voltage_cell,Battery cell voltage,V,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_voltage,Battery voltage,V,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_cycles,Battery number of cycles,,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_temperature,Battery temperature,C,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_capacity_percent,Battery capacity percent for lifetime,%,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_capacity_thermal_percent,Battery capacity percent for temperature,%,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_bank_replacement,Battery bank replacements per year,number/year,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_power,Power to/from battery,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,grid_power,Power to/from grid,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,pv_batt_gen,Power of PV+battery,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,pv_to_load,Power to load from PV,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_to_load,Power to load from battery,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,grid_to_load,Power to load from grid,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,pv_to_batt,Power to battery from PV,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,grid_to_batt,Power to battery from grid,kW,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,monthly_pv_to_load,Energy to load from PV,kWh,,Battery,,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_batt_to_load,Energy to load from battery,kWh,,Battery,,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,monthly_grid_to_load,Energy to load from grid,kWh,,Battery,,LENGTH=12
+SSC_OUTPUT,SSC_ARRAY,batt_annual_charge_from_pv,Battery annual energy charged from pv,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_annual_charge_from_grid,Battery annual energy charged from grid,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_annual_charge_energy,Battery annual energy charged,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_annual_discharge_energy,Battery annual energy discharged,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,batt_annual_energy_loss,Battery annual energy loss,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,annual_export_to_grid_energy,Annual energy exported to grid,kWh,,Battery,,
+SSC_OUTPUT,SSC_ARRAY,annual_import_to_grid_energy,Annual energy imported from grid,kWh,,Battery,,
+SSC_OUTPUT,SSC_NUMBER,average_cycle_efficiency,Battery average cycle efficiency,%,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,batt_pv_charge_percent,Battery percent energy charged from PV,%,,Annual,,
+SSC_OUTPUT,SSC_NUMBER,batt_bank_installed_capacity,Battery bank installed capacity,kWh,,Annual,,
+SSC_OUTPUT,SSC_MATRIX,batt_dispatch_sched,Battery dispatch schedule,,,Battery,,
