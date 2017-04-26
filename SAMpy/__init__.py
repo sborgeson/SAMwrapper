@@ -87,8 +87,8 @@ weather_path = get_weather_path()
 sys.path.insert(0, os.path.join(sdk_path, "languages", "python"))
 from sscapi import PySSC
 
-from portable_sscapi import PortablePySSC
-from sam_wrapper import SAMEngine
+from .portable_sscapi import PortablePySSC
+from .sam_wrapper import SAMEngine
 # Import the oficcial python SDK wrapper, which our portable version will extend
 
 # Copied from the sscapi outside of the class definition
