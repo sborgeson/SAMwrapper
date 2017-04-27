@@ -1,5 +1,5 @@
 # SAMpy
-A python wrapper around NREL's SAM (System Advisory Model) SDK, which is primitive and not very pythonic
+A high level python 2.x and 3.x wrapper around NREL's official SAM (System Advisory Model) SDK, which is low level, not very pythonic, and doesn't support python 3.
 
 # External software requirements
 * Requires and wraps around the SAM SDK, which you can download and extract from: https://sam.nrel.gov/node/69515 (the path to the SDK is a SAMpy config options).
@@ -9,7 +9,21 @@ A python wrapper around NREL's SAM (System Advisory Model) SDK, which is primiti
 While it is expected to work with a range of versions, testing of this module currently covers SAM 2017.1.17 and SAM SDK 2017.1.17.r1.
 
 # Example usage
+
+Install from github
+```sh
+pip install --upgrade git+https://github.com/sborgeson/SAMpy
+```
+
+Run a simple PV Watts simulation example
+```sh
+python pvwatts_example.py
+```
+Which executes the following
+
 ```python
+from SAMpy import SAMEngine
+
 model_params = {
     'system_capacity': 4,
     'module_type': 0,
@@ -41,10 +55,18 @@ cols_of_interest = [
     'gen'  #0.0, 0.0] + 8758
 ]
 
+# initialize the SAM system, which includes loading the underlying ssc shared library
 sam = SAMEngine(debug=True)
+
+# perform the modeling run
 results = sam.run_pvwatts(model_params=model_params)
 
-sam.summarize( results )
+# print out the details of the model results
+print(sam.summarize(results))
+
+# extract an [8760 x n] DataFrame of hourly simulation output values
 resultsdf = sam.results_to_pandas(results,cols_of_interest)
-print(resultsdf)
+
+# a look at the structure of the data
+print(resultsdf.head(5))
 ```
