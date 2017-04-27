@@ -44,7 +44,7 @@ if __name__ == '__main__':
     # perform the modeling run
     results = sam.run_pvwatts(model_params=model_params)
 
-    # pring out the details of the model results
+    # print out the details of the model results
     print(sam.summarize(results))
 
     # extract an [8760 x n] DataFrame of hourly simulation output values
