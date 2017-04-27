@@ -52,3 +52,4 @@ if __name__ == '__main__':
 
     # a look at the structure of the data
     print(resultsdf.head(5))
+    print(resultsdf.tail(5))

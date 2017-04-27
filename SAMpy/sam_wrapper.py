@@ -3,10 +3,14 @@
 # file 'LICENSE', which is part of this source code package.
 # Direct inquiries to Sam Borgeson (sam@convergenceda.com)
 
-import os, sys
+import os
+import sys
+import re
 import numbers
+import json
 import numpy as np
 import pandas as pd
+from collections import OrderedDict
 from SAMpy import PortablePySSC, weather_path, sam_path
 
 class SAMEngine:
@@ -30,11 +34,12 @@ class SAMEngine:
         else:
             return (str(m))
 
-    def results_to_pandas(self, ssc_data, names):
+    def results_to_pandas(self, ssc_data, names, ):
         resultCols = {}
         for name in names:
             resultCols[name] = self.ssc.data_get_array(ssc_data, name)
-        return pd.DataFrame(data=resultCols)
+        dt_hrs = pd.date_range('1/1/2015', periods=8760, freq='H')
+        return pd.DataFrame(data=resultCols, index=dt_hrs)
 
     def summarize(self, ssc_data):
         name = self.ssc.data_first(ssc_data) # note that this is bytes, which must be converted to a str in python 3
@@ -102,22 +107,28 @@ class SAMEngine:
     def free_data(self,data):    # releases reference to entire data object
         self.ssc.data_free(data)
 
-    def run_pvwatts(self, ssc_data=None, model_params=None, output_selector=None ):
-        return( self.run_module( 'pvwattsv5', ssc_data=ssc_data, model_params=model_params, output_selector=output_selector ) )
+    def run_pvwatts(self, ssc_data=None, model_params=None, lk_script=None, output_selector=None ):
+        return( self.run_module( 'pvwattsv5', ssc_data=ssc_data, model_params=model_params, lk_script=lk_script, output_selector=output_selector ) )
 
-    def run_pvsam(self, ssc_data=None, model_params=None, output_selector=None ):
-        return( self.run_module( 'pvsamv1', ssc_data=ssc_data, model_params=model_params, output_selector=output_selector ) )
+    def run_pvsam(self, ssc_data=None, model_params=None, lk_script=None, output_selector=None ):
+        return( self.run_module( 'pvsamv1', ssc_data=ssc_data, model_params=model_params, lk_script=lk_script, output_selector=output_selector ) )
 
-    def run_module(self, module_name, ssc_data=None, model_params=None, output_selector=None ):
+    def run_module(self, module_name, ssc_data=None, model_params=None, lk_script=None, output_selector=None ):
         if ssc_data is None: ssc_data = self.ssc.data_create()
-
+        ssc_config = {}
+        if lk_script is not None:
+            if self.debug: print("[run_module] Using parameters from lk as base input")
+            lk_params = LKInterpreter(lk_script).sam_vars_to_dict()
+            ssc_config.update(lk_params)
         if model_params is not None:
-            if self.debug: print("[run_module] Preparing SAM model data structure with model parameters")
-            self.set_from_dict( model_params, ssc_data )
-            if self.debug:
-                print('[rum_module] Data values set. Here they are:')
-                print(self.summarize(ssc_data))
-                print()
+            if self.debug: print("[run_module] Using passed model parameters as model inputs")
+            ssc_config.update(model_params)
+        if self.debug: print("[run_module] Preparing SAM model data structure with model parameters")
+        self.set_from_dict( ssc_config, ssc_data )
+        if self.debug:
+            print('[rum_module] Data values set. Here they are:')
+            print(self.summarize(ssc_data))
+            print()
 
         samModule = None
         try:
@@ -137,4 +148,39 @@ class SAMEngine:
         return out
 
 
+class LKInterpreter():
+    '''You can press Shift F5 to generate an LK script file that sets the values of the input
+    variables for each SSC module your SAM cases uses to the SAM input values. This class can
+    interpret those files.
+    Note: this class only looks for var setting commands and doesn't do anything else that LK does.'''
+    # match variable name, value in the form "var('variable name', value );"
+    # the DOTALL allows matches to span newlines and the (.+?) groups are non-greedy matches
+    varRE = re.compile('var\s*\(\s*\'(.+?)\'\s*\,\s*(.+?)\s*\)\;', re.DOTALL)
+    text1RE = re.compile('\s*\'(.*)\'\s*')  # single quotes
+    text2RE = re.compile('\s*\"(.*)\"\s*')  # double quotes
+
+    def __init__(self, fpath):
+        with open(fpath, 'r') as lkFile:
+            self.lkText = lkFile.read()
+
+    def sam_vars_to_dict(self):
+        samVars = OrderedDict()
+        for i, match in enumerate(self.varRE.finditer(self.lkText)):
+            (var, val) = (match.group(1), match.group(2))
+            # look for quote enclosed text
+            t1 = self.text1RE.search(val)
+            t2 = self.text2RE.search(val)
+            if t1 is not None:
+                val = t1.group(1)
+            elif t2 is not None:
+                val = t2.group(1)
+            # fall back to json parsing of numbers and more complex data
+            # Note this *seems* to cover all cases
+            else:
+                try:
+                    val = json.loads(val)
+                except ValueError:
+                    print("JSON can't parse %s, %s" % (var, val))
+            samVars[var] = val
+        return (samVars)
 
