@@ -1,7 +1,7 @@
 import os, sys
 import json
 import struct
-from ctypes import CDLL
+from ctypes import *
 from SAMpy import get_sdk_path, PySSC
 
 class PortablePySSC(PySSC):

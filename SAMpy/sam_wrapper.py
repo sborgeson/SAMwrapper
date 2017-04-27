@@ -24,26 +24,28 @@ class SAMEngine:
     def results_to_pandas(self, ssc_data, names):
         resultCols = {}
         for name in names:
-            resultCols[name] = self.ssc.data_get_array(ssc_data, name)
+            resultCols[name] = self.ssc.data_get_array(ssc_data, name.encode('ascii'))
         return pd.DataFrame(data=resultCols)
 
     def summarize(self, ssc_data):
         name = self.ssc.data_first(ssc_data)
+        nameStr = str(name)
         while (name != None):
             data_type = self.ssc.data_query(ssc_data, name)
+            if self.debug: print(name, type(name), data_type)
             outstr = '\t'
             if data_type == self.ssc.STRING:
-                outstr += ' str: ' + name + '    \'' + self.ssc.data_get_string(ssc_data, name) + '\''
+                outstr += ' str: ' + nameStr + '    \'' + str(self.ssc.data_get_string(ssc_data, name)) + '\''
             elif data_type == self.ssc.NUMBER:
-                outstr += ' num: ' + name + '    ' + str(self.ssc.data_get_number(ssc_data, name))
+                outstr += ' num: ' + nameStr + '    ' + str(self.ssc.data_get_number(ssc_data, name))
             elif data_type == self.ssc.ARRAY:
-                outstr += ' arr: ' + name + '    [ ' + self.arr_to_str(self.ssc.data_get_array(ssc_data, name), 2) + ' ]'
+                outstr += ' arr: ' + nameStr + '    [ ' + self.arr_to_str(self.ssc.data_get_array(ssc_data, name), 2) + ' ]'
             elif data_type == self.ssc.MATRIX:
-                outstr += ' mat: ' + name + '    [ ' + self.mat_to_str(self.ssc.data_get_matrix(ssc_data, name)) + ' ]'
+                outstr += ' mat: ' + nameStr + '    [ ' + self.mat_to_str(self.ssc.data_get_matrix(ssc_data, name)) + ' ]'
             elif data_type == 5:
-                outstr += ' tab: ' + name + '    TBD'
+                outstr += ' tab: ' + nameStr + '    TBD'
             else:
-                outstr += ' inv! ' + name
+                outstr += ' inv! ' + nameStr
 
             print(outstr)
             name = self.ssc.data_next(ssc_data)
@@ -57,6 +59,10 @@ class SAMEngine:
             if isinstance(value, np.int64):   value = value.astype(int)
             if isinstance(value, np.float64): value = value.astype(float)
             if isinstance(value, np.ndarray): value = value.tolist()
+            # in Python 3, strings are all unicode, but the underlying DLL is expecting ascii bytes
+            # thus all keys and values that are strings, need to be encoded as ascii
+            #if isinstance(value, str): value = value.encode('ascii')
+            key = key.encode('ascii')
 
             if isinstance(value, dict):
                 subTable = self.ssc.data_create()                # create an empty SAM sub data table
@@ -65,13 +71,13 @@ class SAMEngine:
             elif isinstance(value, numbers.Number):
                 self.ssc.data_set_number(ssc_data, key, value)
             elif type(value) == str:
-                self.ssc.data_set_string(ssc_data, key, value)
+                self.ssc.data_set_string(ssc_data, key, value.encode('ascii'))
             elif type(value) == list and isinstance(value[0], numbers.Number):
                 self.ssc.data_set_array(ssc_data, key, value)
             elif type(value) == list and isinstance(value[0], list):
                 self.ssc.data_set_matrix(ssc_data, key, value)
             else:
-                print('"%s" is not a type we know how ot map to SSC %s' % (key, type(ssc_data)))
+                print('"%s" is not a type we know how to map to SSC %s' % (key, type(ssc_data)))
 
     def clear_data(self,data): # clears all values from data object
         self.ssc.data_free(data)
@@ -101,7 +107,7 @@ class SAMEngine:
         if self.debug: print("Executing SAM Simulation using %s..." % (module_name))
         samModule = None
         try:
-            samModule = self.ssc.module_create(module_name)
+            samModule = self.ssc.module_create(module_name.encode('ascii'))
             if not self.debug: self.ssc.module_exec_set_print( 0 ) # no chatter during simulation
             runStatus = self.ssc.module_exec( samModule, ssc_data )
             if(runStatus != 1): raise Exception('Bad status from SAM simulation of %s.' % (module_name))
