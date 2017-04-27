@@ -3,7 +3,7 @@ import json
 import struct
 import ctypes
 from ctypes import *
-from SAMpy import get_sdk_path, PySSC
+from SAMpy import get_sdk_path
 
 # define a generic number function to handle number conversions into c
 c_number = c_float # must be c_double or c_float depending on how defined in sscapi.h
@@ -17,7 +17,7 @@ def c_char_bytes_p(val):
         val = val.encode('utf-8')
     return c_char_p(val)
 
-class PortablePySSC(PySSC):
+class PortablePySSC():
     '''An extension of the standard PySSC class (which hard codes share library paths to one
     that points to a configurable location'''
 

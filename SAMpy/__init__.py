@@ -92,10 +92,6 @@ sdk_path = get_sdk_path()
 sam_path = get_sam_path()
 weather_path = get_weather_path()
 
-# Add the SDK to the system path so the non-portable PySSC they provide can be imported
-sys.path.insert(0, os.path.join(sdk_path, "languages", "python"))
-from sscapi import PySSC
-
 from .portable_sscapi import PortablePySSC
 from .sam_wrapper import SAMEngine
 # Import the oficcial python SDK wrapper, which our portable version will extend
