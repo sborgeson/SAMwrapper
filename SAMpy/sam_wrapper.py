@@ -28,7 +28,7 @@ class SAMEngine:
         return pd.DataFrame(data=resultCols)
 
     def summarize(self, ssc_data):
-        name = self.ssc.data_first(ssc_data)
+        name = self.ssc.data_first(ssc_data) # note that this is bytes, which must be converted to a str in python 3
         nameStr = str(name)
         while (name != None):
             data_type = self.ssc.data_query(ssc_data, name)

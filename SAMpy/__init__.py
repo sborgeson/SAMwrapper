@@ -33,7 +33,7 @@ def get_config_value(key, instructions, prompt, validate, validate_error, cfg_fi
         # provoke KeyError if not found
         junk = config[key]
     except (ValueError, KeyError) as err:
-        print(err.message)
+        print(str(err))
         print(instructions)
 
         # get command line input into a valid path is provided
