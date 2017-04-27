@@ -1,3 +1,8 @@
+# Copyright 2017, Sam Borgeson.
+# This file is subject to the terms and conditions defined in
+# file 'LICENSE', which is part of this source code package.
+# Direct inquiries to Sam Borgeson (sam@convergenceda.com)
+
 from SAMpy import SAMEngine
 
 if __name__ == '__main__':
@@ -33,9 +38,17 @@ if __name__ == '__main__':
         'gen'  #0.0, 0.0] + 8758
     ]
 
+    # initialize the SAM system, which includes loading the underlying ssc shared library
     sam = SAMEngine(debug=True)
+
+    # perform the modeling run
     results = sam.run_pvwatts(model_params=model_params)
 
+    # pring out the details of the model results
     print(sam.summarize(results))
+
+    # extract an [8760 x n] DataFrame of hourly simulation output values
     resultsdf = sam.results_to_pandas(results,cols_of_interest)
+
+    # a look at the structure of the data
     print(resultsdf.head(5))
