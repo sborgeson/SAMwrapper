@@ -13,7 +13,7 @@ if __name__ == '__main__':
         'azimuth': 180,
         'gcr': 0.4,
         'adjust:constant': 0,
-        "solar_resource_file": 'C:\\SAM\\2017.1.17\\solar_resource\\Australia AUS Melbourne (INTL).csv'
+        "solar_resource_file": 'Australia AUS Melbourne (INTL).csv'
     }
 
     cols_of_interest = [
@@ -36,6 +36,6 @@ if __name__ == '__main__':
     sam = SAMEngine(debug=True)
     results = sam.run_pvwatts(model_params=model_params)
 
-    sam.summarize( results )
+    print(sam.summarize(results))
     resultsdf = sam.results_to_pandas(results,cols_of_interest)
-    print(resultsdf)
+    print(resultsdf.head(5))
