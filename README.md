@@ -14,12 +14,15 @@ Install from github
 ```sh
 pip install --upgrade git+https://github.com/sborgeson/SAMpy
 ```
-
+Install from source (after cloning this repository)
+```
+python setup.py install
+```
 Run a simple PV Watts simulation example
 ```sh
 python pvwatts_example.py
 ```
-Which executes the following
+Which executes the following code
 
 ```python
 from SAMpy import SAMEngine
