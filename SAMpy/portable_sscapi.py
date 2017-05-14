@@ -30,16 +30,16 @@ class PortablePySSC():
         # SAM sdk path. For example: 'C:/SAM/2017.1.17/sam-sdk-2017-1-17-r1'
         if sdk_path is None:
             sdk_path = get_sdk_path()
-        if sys.platform == 'win32' or sys.platform == 'cygwin':
+        if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
             if 8*struct.calcsize("P") == 64:
                 #print (os.path.join(sdk_path, 'win64','ssc.dll'))
                 self.pdll = CDLL(os.path.join(sdk_path, 'win64', 'ssc.dll'))
             else:
                 self.pdll = CDLL(os.path.join(sdk_path, 'win32', 'ssc.dll'))
-        elif sys.platform == 'darwin':
-            self.pdll = CDLL(os.path.join(sdk_path, "osx64', 'ssc.dylib"))
-        elif sys.platform == 'linux2':
-            self.pdll = CDLL(os.path.join(sdk_path, "linux64', 'ssc.so"))
+        elif sys.platform.startswith('darwin'):
+            self.pdll = CDLL(os.path.join(sdk_path, 'osx64', 'ssc.dylib'))
+        elif sys.platform.startswith('linux'):
+            self.pdll = CDLL(os.path.join(sdk_path, 'linux64', 'ssc.so'))
         else:
             print("Platform not supported ", sys.platform)
 
