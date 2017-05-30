@@ -98,7 +98,7 @@ sam_path = get_sam_path()
 weather_path = get_weather_path()
 
 from .portable_sscapi import PortablePySSC
-from .sam_wrapper import SAMEngine
+from .sam_wrapper import SAMEngine, LKInterpreter
 # Import the oficcial python SDK wrapper, which our portable version will extend
 
 # Copied from the sscapi outside of the class definition
