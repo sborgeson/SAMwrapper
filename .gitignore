@@ -13,7 +13,7 @@ scratch/
 .idea/
 
 # user generated configuration
-SAMpy.cfg
+SAMwrapper.cfg
 
 # Distribution / packaging
 .Python

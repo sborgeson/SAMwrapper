@@ -11,7 +11,14 @@ import json
 import numpy as np
 import pandas as pd
 from collections import OrderedDict
-from SAMpy import PortablePySSC, weather_path, sam_path
+from SAMwrapper import PortablePySSC, weather_path, sam_path
+
+# Give python 3 a value for unicode so type comparison can run
+# with both str and unicode
+try:
+    unicode
+except NameError:
+    unicode = str
 
 class SAMEngine:
 

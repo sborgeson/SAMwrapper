@@ -8,7 +8,7 @@ import json
 import struct
 import ctypes
 from ctypes import *
-from SAMpy import get_sdk_path
+from SAMwrapper import get_sdk_path
 
 # define a generic number function to handle number conversions into c
 c_number = c_float # must be c_double or c_float depending on how defined in sscapi.h

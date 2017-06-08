@@ -8,10 +8,10 @@ try:
 except ImportError:
     from distutils.core import setup
 
-setup(name='SAMpy',
+setup(name='SAMwrapper',
       version='0.1',
-      description="High level python 2.x and 3.x wrapper around NREL's SAM SDK",
-      packages=['SAMpy'],
+      description="High level python 2.x and 3.x wrapper around NREL's SAM SDK, a distributed energy simulation engine",
+      packages=['SAMwrapper'],
       install_requires=[  'numpy', 'pandas' ],
       author='Sam Borgeson',
       author_email='sam@convergenceda.com',

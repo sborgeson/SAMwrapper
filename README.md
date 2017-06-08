@@ -1,8 +1,11 @@
-# SAMpy
-A high level python 2.x and 3.x wrapper around NREL's official SAM (System Advisory Model) SDK, which is low level, not very pythonic, and doesn't support python 3.
+# SAMwrapper
+A high level python 2.x and 3.x wrapper around NREL's official SAM (System Advisory Model) SDK, which is low level, not
+very pythonic, and doesn't support python 3. SAM is simulation system for distributed energy projects, with the ability
+to configure and simulate PV, batteries, and other DER systems. This package provides a pythonic wrapper around their
+bare bones SDK.
 
 # External software requirements
-* Requires and wraps around the SAM SDK, which you can download and extract from: https://sam.nrel.gov/node/69515 (the path to the SDK is a SAMpy config options).
+* Requires and wraps around the SAM SDK, which you can download and extract from: https://sam.nrel.gov/node/69515 (the path to the SDK is a SAMwrapper config options).
 * Uses resource from the SAM GUI tool, which you can download and install from: https://sam.nrel.gov/download
 
 # Compatability
@@ -12,7 +15,7 @@ While it is expected to work with a range of versions, testing of this module cu
 
 Install from github
 ```sh
-pip install --upgrade git+https://github.com/sborgeson/SAMpy
+pip install --upgrade git+https://github.com/sborgeson/SAMwrapper
 ```
 Install from source (after cloning this repository)
 ```
@@ -25,7 +28,7 @@ python pvwatts_example.py
 Which executes the following code
 
 ```python
-from SAMpy import SAMEngine
+from SAMwrapper import SAMEngine
 
 model_params = {
     'system_capacity': 4,

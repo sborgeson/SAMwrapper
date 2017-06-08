@@ -17,7 +17,9 @@ try:
 except NameError:
     pass
 
-def load_config(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+CFG = 'SAMwrapper.cfg'
+
+def load_config(cfg_file=os.path.join(cwd, CFG)):
     '''Load configuration information from a json encoded file.
     Core config options are:
     sdk_path: path to the local install of the SAM SDK
@@ -29,13 +31,13 @@ def load_config(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
         config = json.load(cf)
     return config
 
-def write_config(config, cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+def write_config(config, cfg_file=os.path.join(cwd, CFG)):
     '''Write the system configuration to the passed path.'''
     print('writing config to {}'.format(cfg_file))
     with open(cfg_file,'w') as cf:
         json.dump(config, cf, sort_keys=True, indent=4, separators=(',', ': '))
 
-def get_config_value(key, instructions, prompt, validate, validate_error, cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+def get_config_value(key, instructions, prompt, validate, validate_error, cfg_file=os.path.join(cwd, CFG)):
     '''Learn where the SAM SDK is on the local system and return that path:
     (1) Look in a simple configuration file.
     (2) If not found, prompt the user, check directory existence, and write to the config file.
@@ -59,7 +61,7 @@ def get_config_value(key, instructions, prompt, validate, validate_error, cfg_fi
         write_config(config, cfg_file)
     return config[key]
 
-def get_sdk_path(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+def get_sdk_path(cfg_file=os.path.join(cwd, CFG)):
     key = 'sdk_path'
     instructions =  '''This module is a wrapper for the SAM SDK found here: 
                     https://sam.nrel.gov/sdk
@@ -70,7 +72,7 @@ def get_sdk_path(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
     validate_error = 'That path does not exist. Please enter another.'
     return get_config_value(key, instructions, prompt, validate, validate_error, cfg_file)
 
-def get_sam_path(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+def get_sam_path(cfg_file=os.path.join(cwd, CFG)):
     key = 'sam_path'
     instructions =  '''This module relies on the resources of the SAM PV and battery simulation tool found here: 
                     https://sam.nrel.gov/download
@@ -81,7 +83,7 @@ def get_sam_path(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
     validate_error = 'That path does not exist. Please enter another.'
     return get_config_value(key, instructions, prompt, validate, validate_error, cfg_file)
 
-def get_weather_path(cfg_file=os.path.join(cwd, 'SAMpy.cfg')):
+def get_weather_path(cfg_file=os.path.join(cwd, CFG)):
     key = 'weather_path'
     instructions =  '''Where a file name without a path is passed to a simulation, this module loads 
                     TMY (aka solar resource) or custom weather data from the default 'solar_resource' directory 

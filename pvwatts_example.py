@@ -4,7 +4,7 @@
 # Direct inquiries to Sam Borgeson (sam@convergenceda.com)
 
 import os
-from SAMpy import SAMEngine, LKInterpreter
+from SAMwrapper import SAMEngine, LKInterpreter
 
 if __name__ == '__main__':
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     ]
 
     sam = SAMEngine(debug=False)
-    lki = LKInterpreter('C:/dev/SAMpy/scratch/lk/untitled.lk', debug=False)
+    lki = LKInterpreter('C:/dev/SAMwrapper/scratch/lk/untitled.lk', debug=False)
     run_config = lki.sam_vars_to_dict()
     print(run_config.keys())
     results = sam.run_from_config(run_config,output_selector=None)
