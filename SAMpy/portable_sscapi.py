@@ -39,6 +39,7 @@ class PortablePySSC():
         elif sys.platform.startswith('darwin'):
             self.pdll = CDLL(os.path.join(sdk_path, 'osx64', 'ssc.dylib'))
         elif sys.platform.startswith('linux'):
+
             self.pdll = CDLL(os.path.join(sdk_path, 'linux64', 'ssc.so'))
         else:
             print("Platform not supported ", sys.platform)

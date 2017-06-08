@@ -113,6 +113,17 @@ class SAMEngine:
     def run_pvsam(self, ssc_data=None, model_params=None, lk_script=None, output_selector=None ):
         return( self.run_module( 'pvsamv1', ssc_data=ssc_data, model_params=model_params, lk_script=lk_script, output_selector=output_selector ) )
 
+    def run_from_config(self, run_config, ssc_data=None, output_selector=None):
+        if ssc_data is None:
+            ssc_data = self.ssc.data_create()
+        for module in run_config.keys():
+            print('Running module {}'.format(module))
+            ssc_data = self.run_module(module_name=module, model_params=run_config[module], ssc_data=ssc_data)
+        out = ssc_data
+        if output_selector is not None:
+            out = output_selector(ssc_data)  # self.ssc.data_get_array( sscData, outVar )
+        return out
+
     def run_module(self, module_name, ssc_data=None, model_params=None, lk_script=None, output_selector=None ):
         if ssc_data is None: ssc_data = self.ssc.data_create()
         ssc_config = {}
@@ -143,7 +154,7 @@ class SAMEngine:
         if output_selector is not None:
             # TODO: this should be more sophisticated about what data it looks for and what type that data is
             # two use cases: return more than one variable of data at a time or return non-array data.
-            # todo: include a look at "kwh_per_kw", which is present in both pvwatts and pvsam
+            # TODO: include a look at "kwh_per_kw", which is present in both pvwatts and pvsam
             out = output_selector(ssc_data)  # self.ssc.data_get_array( sscData, outVar )
         return out
 
@@ -156,31 +167,57 @@ class LKInterpreter():
     # match variable name, value in the form "var('variable name', value );"
     # the DOTALL allows matches to span newlines and the (.+?) groups are non-greedy matches
     varRE = re.compile('var\s*\(\s*\'(.+?)\'\s*\,\s*(.+?)\s*\)\;', re.DOTALL)
+    runRE = re.compile('(run\s*\(\s*\'.+?\'\s*\))\;') # match a run line
+    moduleRE = re.compile('run\s*\(\s*\'(.+?)\'\s*\)') # pull the module name out of the run line
+    dataLoadRE = re.compile('real_array\(read_text_file\(\s*\'(.*)\'\s*\)\s*\)')
     text1RE = re.compile('\s*\'(.*)\'\s*')  # single quotes
     text2RE = re.compile('\s*\"(.*)\"\s*')  # double quotes
 
-    def __init__(self, fpath):
+    def __init__(self, fpath, debug=False):
+        self.debug = debug
         with open(fpath, 'r') as lkFile:
             self.lkText = lkFile.read()
 
     def sam_vars_to_dict(self):
-        samVars = OrderedDict()
-        for i, match in enumerate(self.varRE.finditer(self.lkText)):
-            (var, val) = (match.group(1), match.group(2))
-            # look for quote enclosed text
-            t1 = self.text1RE.search(val)
-            t2 = self.text2RE.search(val)
-            if t1 is not None:
-                val = t1.group(1)
-            elif t2 is not None:
-                val = t2.group(1)
-            # fall back to json parsing of numbers and more complex data
-            # Note this *seems* to cover all cases
+        # split the string into an array of strings, alternating between var
+        # setting sections and module running sections
+        lk_sections = self.runRE.split(self.lkText)
+        module = 'default'
+        module_vars = {}
+        run_configuration = OrderedDict()
+        for lk_section in lk_sections:
+            # the modules for run commands become the keys in our run_configuration
+            if lk_section.startswith('run('):
+                module = self.moduleRE.match(lk_section).group(1)
+                if self.debug:
+                    print('Setting variables for module {}'.format(module))
+                    print(module_vars)
+                run_configuration[module] = module_vars
             else:
-                try:
-                    val = json.loads(val)
-                except ValueError:
-                    print("JSON can't parse %s, %s" % (var, val))
-            samVars[var] = val
-        return (samVars)
+                module_vars = OrderedDict()
+                for i, match in enumerate(self.varRE.finditer(lk_section)):
+                    (var, val) = (match.group(1), match.group(2))
+                    # look for loading data from file
+                    data_load = self.dataLoadRE.search(val)
+                    # look for quote enclosed text
+                    t1 = self.text1RE.search(val)
+                    t2 = self.text2RE.search(val)
+                    if data_load is not None:
+                        data_file = data_load.group(1)
+                        print('loading data from {}'.format(data_file))
+                        with open(data_file,'r') as array_data:
+                            val = [float(x) for x in array_data]
+                    elif t1 is not None:
+                        val = t1.group(1)
+                    elif t2 is not None:
+                        val = t2.group(1)
+                    # fall back to json parsing of numbers and more complex data
+                    # Note this *seems* to cover all cases
+                    else:
+                        try:
+                            val = json.loads(val)
+                        except ValueError:
+                            print("JSON can't parse %s, %s" % (var, val))
+                    module_vars[var] = val
+        return (run_configuration)
 
