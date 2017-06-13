@@ -83,13 +83,24 @@ def get_sam_path(cfg_file=os.path.join(cwd, CFG)):
     validate_error = 'That path does not exist. Please enter another.'
     return get_config_value(key, instructions, prompt, validate, validate_error, cfg_file)
 
-def get_weather_path(cfg_file=os.path.join(cwd, CFG)):
-    key = 'weather_path'
+def get_solar_path(cfg_file=os.path.join(cwd, CFG)):
+    key = 'weather_path' # this is used for solar resource data, but it was originally called weather_path
     instructions =  '''Where a file name without a path is passed to a simulation, this module loads 
                     TMY (aka solar resource) or custom weather data from the default 'solar_resource' directory 
                     under the SAM tool install directory. If you would like to configure a different default 
                     location, provide it below. If not, just hit return.'''
-    prompt = 'Enter the path to your weather directory or press return for the default: '
+    prompt = 'Enter the path to your solar resource directory or press return for the default: '
+    validate = lambda x: x == '' or os.path.exists(x)
+    validate_error = 'That path does not exist. Please enter another.'
+    return get_config_value(key, instructions, prompt, validate, validate_error, cfg_file)
+
+def get_wind_path(cfg_file=os.path.join(cwd, CFG)):
+    key = 'wind_path'
+    instructions =  '''Where a file name without a path is passed to a simulation, this module loads 
+                    wind data from the default 'wind_resource' directory 
+                    under the SAM tool install directory. If you would like to configure a different default 
+                    location, provide it below. If not, just hit return.'''
+    prompt = 'Enter the path to your wind resource directory or press return for the default: '
     validate = lambda x: x == '' or os.path.exists(x)
     validate_error = 'That path does not exist. Please enter another.'
     return get_config_value(key, instructions, prompt, validate, validate_error, cfg_file)
@@ -97,11 +108,13 @@ def get_weather_path(cfg_file=os.path.join(cwd, CFG)):
 # Identify the path to the SAM SDK
 sdk_path = get_sdk_path()
 sam_path = get_sam_path()
-weather_path = get_weather_path()
+weather_path = get_solar_path()# weather path should be called solar path, but this is here for backwards compatibility
+solar_path = get_solar_path()
+wind_path = get_wind_path()
 
 from .portable_sscapi import PortablePySSC
 from .sam_wrapper import SAMEngine, LKInterpreter
-# Import the oficcial python SDK wrapper, which our portable version will extend
+# Import the official python SDK wrapper, which our portable version will extend
 
 # Copied from the sscapi outside of the class definition
 #from ctypes import c_float

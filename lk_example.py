@@ -4,7 +4,7 @@
 # Direct inquiries to Sam Borgeson (sam@convergenceda.com)
 
 import os
-from SAMwrapper import SAMEngine
+from SAMwrapper import SAMEngine, LKInterpreter
 
 if __name__ == '__main__':
 
@@ -39,18 +39,11 @@ if __name__ == '__main__':
         'gen'  #0.0, 0.0] + 8758
     ]
 
-    # initialize the SAM system, which includes loading the underlying ssc shared library
-    sam = SAMEngine(debug=True)
+    sam = SAMEngine(debug=False)
+    lki = LKInterpreter('test/lk/untitled.lk', debug=False)
+    run_config = lki.sam_vars_to_dict()
+    print(run_config.keys())
+    results = sam.run_from_config(run_config,output_selector=None)
 
-    # perform the modeling run
-    results = sam.run_pvwatts(model_params=model_params)
-
-    # print out the details of the model results
     print(sam.summarize(results))
 
-    # extract an [8760 x n] DataFrame of hourly simulation output values
-    resultsdf = sam.results_to_pandas(results,cols_of_interest)
-
-    # a look at the structure of the data
-    print(resultsdf.head(5))
-    print(resultsdf.tail(5))
