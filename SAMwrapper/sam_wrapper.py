@@ -104,9 +104,9 @@ class SAMEngine:
             if isinstance(value, np.ndarray): value = value.tolist()
 
             # implement the default resource data path fallback mechanism
-            if key == 'wind_resource_file':
+            if key == 'wind_resource_filename':
                 value = self.resolve_resource_path(value,'wind')
-                if self.debug: print('  wind_resource_file: {}'.format(value))
+                if self.debug: print('  wind_resource_filename: {}'.format(value))
             if key == 'solar_resource_file':
                 value = self.resolve_resource_path(value, 'solar')
                 if self.debug: print('  solar_resource_file: {}'.format(value))
@@ -269,7 +269,7 @@ class LKInterpreter():
                         if not os.path.isfile(val):
                             val = re.split('[\\\/]', val)[-1]
                             val = SAMEngine.resolve_resource_path( val, type='solar')
-                    if var == 'wind_resource_file':
+                    if var == 'wind_resource_filename':
                         if not os.path.isfile(val):
                             val = re.split('[\\\/]', val)[-1]
                             val = SAMEngine.resolve_resource_path(val, type='wind')
