@@ -199,10 +199,10 @@ class SAMEngine:
 
 
 class LKInterpreter():
-    '''You can press Shift F5 to generate an LK script file that sets the values of the input
+    '''You can press Shift F5 within the SAM GUI to generate an LK script file that sets the values of the input
     variables for each SSC module your SAM cases uses to the SAM input values. This class can
     interpret those files.
-    Note: this class only looks for var setting commands and doesn't do anything else that LK does.'''
+    Note: this class only looks for var setting commands and module invocations and doesn't do anything else that LK does.'''
     # match variable name, value in the form "var('variable name', value );"
     # the DOTALL allows matches to span newlines and the (.+?) groups are non-greedy matches
     varRE = re.compile('var\s*\(\s*\'(.+?)\'\s*\,\s*(.+?)\s*\)\;', re.DOTALL)
