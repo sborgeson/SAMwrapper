@@ -5,7 +5,7 @@ to configure and simulate PV, batteries, and other DER systems. This package pro
 bare bones SDK.
 
 # External software requirements
-* Requires and wraps around the SAM SDK, which you can download and extract from: https://sam.nrel.gov/node/69515 (the path to the SDK is a SAMwrapper config options).
+* Requires and wraps around the SAM SDK, which you can download and extract from: https://sam.nrel.gov/node/69515 (the path to the SDK is a SAMwrapper config option).
 * Uses resource from the SAM GUI tool, which you can download and install from: https://sam.nrel.gov/download
 
 # Compatability
